@@ -107,10 +107,10 @@ function SysLogger() {
  * @param {String} hostname By default is "localhost"
  */
 SysLogger.prototype.set = function(tag, facility, hostname) {
+    this.socket = dgram.createSocket('udp4');
     this.setTag(tag);
     this.setFacility(facility);
     this.setHostname(hostname);
-    
     return this;
 };
 
@@ -144,15 +144,13 @@ SysLogger.prototype.get = function() {
  * @param {Severity} severity
  */
 SysLogger.prototype._send = function(message, severity) {
-    var client = dgram.createSocket('udp4');
     var message = new Buffer('<' + (this.facility * 8 + severity) + '>' +
         getDate() + ' ' + this.hostname + ' ' + 
         this.tag + '[' + process.pid + ']:' + message);
-    client.send(message, 0, message.length, 514, '127.0.0.1', 
+    this.socket.send(message, 0, message.length, 514, '127.0.0.1', 
         function(err) {
             if (err) console.error('Can\'t connect to localhost:514');
     });
-    client.close();
 };
 
 /**

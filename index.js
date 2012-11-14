@@ -106,11 +106,12 @@ function SysLogger() {
  * @param {Facility|Number|String} By default is "user"
  * @param {String} hostname By default is "localhost"
  */
-SysLogger.prototype.set = function(tag, facility, hostname) {
+SysLogger.prototype.set = function(tag, facility, hostname, rs) {
     this.socket = dgram.createSocket('udp4');
     this.setTag(tag);
     this.setFacility(facility);
     this.setHostname(hostname);
+    this.setLogServer(rs);
     return this;
 };
 
@@ -126,6 +127,10 @@ SysLogger.prototype.setFacility = function(facility) {
 };
 SysLogger.prototype.setHostname = function(hostname) {
     this.hostname = hostname || 'localhost';
+    return this;
+};
+SysLogger.prototype.setLogServer = function(rs) {
+    this.logserver = rs || '127.0.0.1';
     return this;
 };
 
@@ -147,9 +152,9 @@ SysLogger.prototype._send = function(message, severity) {
     var message = new Buffer('<' + (this.facility * 8 + severity) + '>' +
         getDate() + ' ' + this.hostname + ' ' + 
         this.tag + '[' + process.pid + ']:' + message);
-    this.socket.send(message, 0, message.length, 514, '127.0.0.1', 
+    this.socket.send(message, 0, message.length, 514, this.logserver, 
         function(err) {
-            if (err) console.error('Can\'t connect to localhost:514');
+            if (err) console.error('Can\'t connect to log server:', this.logserver);
     });
 };
 

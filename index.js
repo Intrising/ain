@@ -231,6 +231,6 @@ SysLogger.prototype.assert = function(expression) {
     }
 };
 
-var logger = new SysLogger();
-logger.set();
-module.exports = logger;
+//var logger = new SysLogger();
+//logger.set();
+module.exports = SysLogger;
